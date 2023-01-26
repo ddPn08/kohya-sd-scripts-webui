@@ -1,3 +1,4 @@
+import argparse
 import launch
 import platform
 import os
@@ -8,10 +9,6 @@ import re
 
 dirname = os.path.dirname(__file__)
 repo_dir = os.path.join(dirname, "kohya_ss")
-
-
-def is_webui_extension():
-    return __name__ == "__main__"
 
 
 def torch_version():
@@ -32,8 +29,8 @@ def xformers_version():
         return None
 
 
-def install_requirements():
-    if is_webui_extension():
+def install_requirements(disable_strict_version):
+    if disable_strict_version:
         with open(os.path.join(repo_dir, "requirements.txt"), "r") as f:
             txt = f.read()
             requirements = [
@@ -54,7 +51,7 @@ def install_requirements():
         )
 
 
-def prepare_environment():
+def prepare_environment(args):
     launch.run(f"{launch.python} -m pip --version")
     if os.path.exists(repo_dir):
         launch.run(f"cd {repo_dir} && {launch.git} fetch --prune")
@@ -64,7 +61,10 @@ def prepare_environment():
             f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git {repo_dir}"
         )
 
-    install_requirements()
+    if not launch.is_installed("gradio"):
+        launch.run_pip("install gradio==3.16.2", "gradio")
+
+    install_requirements(args.disable_strict_version)
 
     if platform.system() == "Windows":
         for file in glob.glob(os.path.join(repo_dir, "bitsandbytes_windows", "*")):
@@ -81,4 +81,4 @@ def prepare_environment():
 
 
 if __name__ == "__main__":
-    prepare_environment()
+    prepare_environment(argparse.Namespace(**{"disable_strict_version": False}))

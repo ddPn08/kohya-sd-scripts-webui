@@ -108,7 +108,7 @@ def on_ui_tabs():
 
 def launch():
     [demo] = on_ui_tabs()
-    demo[0].launch()
+    demo[0].launch(share=shared.cmd_opts.share)
 
 
 if not hasattr(shared, "gradio_template_response_original"):

@@ -1,4 +1,4 @@
-# this scripts installs necessary requirements and launches main program in webui.py
+import argparse
 import install
 import subprocess
 import os
@@ -65,7 +65,15 @@ def run_pip(args, desc=None):
 
 
 if __name__ == "__main__":
-    install.prepare_environment()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--disable-strict-version",
+        action="store_true",
+    )
+    args, _ = parser.parse_known_args(sys.argv)
+    sys.argv.remove("--disable-strict-version")
+
+    install.prepare_environment(args)
 
     from scripts import main
 
