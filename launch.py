@@ -65,7 +65,7 @@ def run_pip(args, desc=None):
 
 
 if __name__ == "__main__":
-    # install.prepare_environment()
+    install.prepare_environment()
 
     from scripts import main
 

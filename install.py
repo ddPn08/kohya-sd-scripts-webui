@@ -48,7 +48,7 @@ def install_requirements():
             )
     else:
         launch.run(
-            f"cd {repo_dir} && install -r requirements.txt",
+            f"cd {repo_dir} && {launch.python} -m pip install -r requirements.txt",
             desc=f"Installing requirements for kohya sd-scripts",
             errdesc=f"Couldn't install requirements for kohya sd-scripts",
         )
