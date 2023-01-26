@@ -9,7 +9,7 @@ It can be used as an extension of [stable-diffusion-webui](https://github.com/AU
 # Usage
 ## As an extension of stable-diffusion-webui
 
-Go to `Extensions` > `nstall from URL`, enter the following URL and press the install button.
+Go to `Extensions` > `Install from URL`, enter the following URL and press the install button.
 
 https://github.com/ddpn08/kohya-sd-scripts-webui.git
 
