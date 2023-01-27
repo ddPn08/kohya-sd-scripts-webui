@@ -19,18 +19,22 @@ def create_ui():
     sd_models_arguments = argparse.ArgumentParser()
     dataset_arguments = argparse.ArgumentParser()
     training_arguments = argparse.ArgumentParser()
+    sd_saving_arguments = argparse.ArgumentParser()
     train_util.add_sd_models_arguments(sd_models_arguments)
     train_util.add_dataset_arguments(dataset_arguments, True, False)
     train_util.add_training_arguments(training_arguments, True)
+    train_util.add_sd_saving_arguments(sd_saving_arguments)
     sd_models_options = {}
     dataset_options = {}
     training_options = {}
+    sd_saving_options = {}
     dreambooth_options = {}
 
     options = lambda: {
         **sd_models_options,
         **dataset_options,
         **training_options,
+        **sd_saving_options,
         **dreambooth_options,
     }
 
@@ -38,6 +42,7 @@ def create_ui():
         **sd_models_arguments.__dict__["_option_string_actions"],
         **dataset_arguments.__dict__["_option_string_actions"],
         **training_arguments.__dict__["_option_string_actions"],
+        **sd_saving_arguments.__dict__["_option_string_actions"],
         **TEMPLATES,
     }
 
@@ -63,6 +68,9 @@ def create_ui():
                 with gr.Box():
                     ui.title("Model options")
                     args_to_gradio(sd_models_arguments, sd_models_options)
+                with gr.Box():
+                    ui.title("Save options")
+                    args_to_gradio(sd_saving_arguments, sd_saving_options)
                 with gr.Box():
                     ui.title("Dataset options")
                     args_to_gradio(dataset_arguments, dataset_options)

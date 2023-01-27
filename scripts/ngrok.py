@@ -1,4 +1,4 @@
-from pyngrok import ngrok, conf, exception
+from pyngrok import conf, exception, ngrok
 
 
 def connect(token, port, region):

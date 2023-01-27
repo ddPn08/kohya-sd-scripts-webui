@@ -1,4 +1,3 @@
-import argparse
 import install
 import subprocess
 import os

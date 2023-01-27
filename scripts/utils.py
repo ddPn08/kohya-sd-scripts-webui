@@ -216,7 +216,10 @@ def gradio_to_args(arguments, options, args):
                 return v
             return None
 
-        return [typer(x) for x in item.split(" ")] if multiple else typer(item)
+        if multiple and item == "":
+            return None
+
+        return [typer(x) for x in item.split(",")] if multiple else typer(item)
 
     args = [(k, format(k)) for k in options.keys()]
     return dict(args)

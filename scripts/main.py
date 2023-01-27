@@ -116,7 +116,7 @@ def launch():
             shared.cmd_opts.port if shared.cmd_opts.port is not None else 7860,
             shared.cmd_opts.ngrok_region,
         )
-        print('Running on ngrok URL: ' + address)
+        print("Running on ngrok URL: " + address)
 
     demo[0].launch(share=shared.cmd_opts.share, server_port=shared.cmd_opts.port)
 

@@ -1,4 +1,5 @@
 import argparse
+import traceback
 
 import gradio as gr
 
@@ -46,6 +47,7 @@ def create_ui():
         try:
             train_network.train(argparse.Namespace(**args))
         except Exception as e:
+            print(traceback.format_exc(limit=50))
             return e.args
         return "Finished."
 

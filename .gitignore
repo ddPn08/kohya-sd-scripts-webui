@@ -3,4 +3,6 @@ venv
 tmp
 
 kohya_ss
+wd14_tagger_model
 presets.json
+meta.json

@@ -5,12 +5,8 @@ import gradio as gr
 from kohya_ss import train_network
 from kohya_ss.library import train_util
 from scripts import presets, ui
-from scripts.utils import (
-    args_to_gradio,
-    gradio_to_args,
-    load_args_template,
-    options_to_gradio,
-)
+from scripts.utils import (args_to_gradio, gradio_to_args, load_args_template,
+                           options_to_gradio)
 
 TEMPLATES = load_args_template("train_textual_inversion.py")
 
