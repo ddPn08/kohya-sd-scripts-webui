@@ -195,16 +195,17 @@ def make_args(d):
     return arguments
 
 
-def gradio_to_args(arguments, options, args):
-    def find_arg(k):
-        for arg in arguments.values():
+def gradio_to_args(arguments, options, args, strarg=False):
+    def find_arg(key):
+        for k, arg in arguments.items():
             arg = arg.__dict__ if hasattr(arg, "__dict__") else arg
-            if arg["dest"] == k:
-                return arg
+            if arg["dest"] == key:
+                return k, arg
+        return None, None
 
     def format(k):
         item = args[options[k]]
-        arg = find_arg(k)
+        key, arg = find_arg(k)
         t = arg_type(arg)
         multiple = "nargs" in arg and arg["nargs"] == "*"
 
@@ -220,20 +221,36 @@ def gradio_to_args(arguments, options, args):
             return None
 
         if multiple and item is None or item == "":
-            return None
+            return key, None
 
-        return [typer(x) for x in item.split(",")] if multiple else typer(item)
+        return key, ([typer(x) for x in item.split(",")] if multiple else typer(item))
 
-    args = [(k, format(k)) for k in options.keys()]
-    return dict(args)
+    if strarg:
+        main = []
+        optional = {}
+
+        for k in options.keys():
+            key, v = format(k)
+            if key.startswith("--"):
+                optional[key.replace("--", "")] = v
+            else:
+                main.append(v)
+
+        main = [x for x in main if x is not None]
+
+        return f"{' '.join(main)} {make_args(optional)}"
+    else:
+        args = [(k, format(k)) for k in options.keys()]
+        return dict(args)
 
 
-def run_python(args, **kwargs):
-    print(f"Started Python: {args}")
+def run_python(script, templates, options, args):
+    args = gradio_to_args(templates, options, args, strarg=True)
+    cmd = f"{python} {script} {args}"
+    print(f"Started Python: {cmd}")
     ps = subprocess.run(
-        f"{python} {args}",
+        cmd,
         shell=True,
-        **kwargs,
     )
 
     return ps.returncode

@@ -2,11 +2,10 @@ import argparse
 
 import gradio as gr
 
-from kohya_ss import train_db
 from kohya_ss.library import train_util
 from scripts import presets, ui
-from scripts.utils import (args_to_gradio, gradio_to_args, load_args_template,
-                           make_args, options_to_gradio, run_python)
+from scripts.utils import (args_to_gradio, load_args_template,
+                           options_to_gradio, run_python)
 
 TEMPLATES, script_file = load_args_template("train_db.py")
 
@@ -46,10 +45,8 @@ def create_ui():
         **TEMPLATES,
     }
 
-    def train(args):
-        args = gradio_to_args(templates(), options(), args)
-        args = make_args(args)
-        status = run_python(f"{script_file} {args}")
+    def run(args):
+        status = run_python(script_file, templates(), options(), args)
         if status != 0:
             return "An error has occurred Please check the output."
         return "Finished successfully."
@@ -77,5 +74,5 @@ def create_ui():
             with gr.Box():
                 ui.title("Trianing options")
                 args_to_gradio(training_arguments, training_options)
-        train_button.click(train, set(options().values()), status)
+        train_button.click(run, set(options().values()), status)
     init()

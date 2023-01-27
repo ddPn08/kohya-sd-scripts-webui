@@ -1,12 +1,9 @@
-import argparse
-
 import gradio as gr
 
-from kohya_ss.networks import merge_lora
 from scripts import presets, ui
-from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
+from scripts.utils import load_args_template, options_to_gradio, run_python
 
-TEMPLATES, _ = load_args_template("networks", "merge_lora.py")
+TEMPLATES, script_file = load_args_template("networks", "merge_lora.py")
 
 
 def title():
@@ -19,13 +16,11 @@ def create_ui():
 
     templates = TEMPLATES
 
-    def train(args):
-        args = gradio_to_args(templates, options, args)
-        try:
-            merge_lora.merge(argparse.Namespace(**args))
-        except Exception as e:
-            return e.args
-        return "Finished."
+    def run(args):
+        status = run_python(script_file, templates, options, args)
+        if status != 0:
+            return "An error has occurred Please check the output."
+        return "Finished successfully."
 
     with gr.Column():
         status = gr.Textbox("", show_label=False, interactive=False)
@@ -37,5 +32,5 @@ def create_ui():
             ui.title("Options")
             with gr.Column():
                 options_to_gradio(TEMPLATES, options)
-        start.click(train, set(options.values()), status)
+        start.click(run, set(options.values()), status)
     init()
