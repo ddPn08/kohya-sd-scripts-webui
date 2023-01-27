@@ -45,4 +45,9 @@ parser.add_argument(
     help="The region in which ngrok should start.",
     default="us",
 )
+parser.add_argument(
+    "--hide-builtin-presets",
+    action="store_true",
+    help="Hide built-in presets",
+)
 cmd_opts, _ = parser.parse_known_args(sys.argv)

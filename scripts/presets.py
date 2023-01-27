@@ -3,10 +3,11 @@ import os
 
 import gradio as gr
 
+import scripts.shared as shared
 from scripts.shared import ROOT_DIR
 from scripts.utils import gradio_to_args
 
-DEFAULT_PRESET_PATH = os.path.join(ROOT_DIR, "presets.json")
+DEFAULT_PRESET_PATH = os.path.join(ROOT_DIR, "built-in-presets.json")
 PRESET_PATH = os.path.join(ROOT_DIR, "presets.json")
 
 
@@ -15,8 +16,11 @@ def load_presets():
         save_presets({})
     if not os.path.exists(DEFAULT_PRESET_PATH):
         save_presets({}, DEFAULT_PRESET_PATH)
-    with open(DEFAULT_PRESET_PATH, mode="r") as f:
-        obj = json.loads(f.read())
+    if shared.cmd_opts.hide_builtin_presets:
+        obj = {}
+    else:
+        with open(DEFAULT_PRESET_PATH, mode="r") as f:
+            obj = json.loads(f.read())
     with open(PRESET_PATH, mode="r") as f:
         obj = {**obj, **json.loads(f.read())}
 
