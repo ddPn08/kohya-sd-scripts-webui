@@ -59,7 +59,6 @@ def prepare_environment():
             f'"{launch.python}" -m {torch_command}',
             "Installing torch and torchvision",
             "Couldn't install torch",
-            live=True,
         )
 
     if not skip_torch_cuda_test:
