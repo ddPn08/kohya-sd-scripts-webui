@@ -1,9 +1,8 @@
 import gradio as gr
 
 from scripts import presets, ui
-from scripts.utils import load_args_template, options_to_gradio, run_python
-
-TEMPLATES, script_file = load_args_template("tools", "detect_face_rotate.py")
+from scripts.runner import initialize_runner
+from scripts.utils import load_args_template, options_to_gradio
 
 
 def title():
@@ -13,13 +12,9 @@ def title():
 def create_ui():
     options = {}
 
-    templates = TEMPLATES
+    templates, script_file = load_args_template("tools", "detect_face_rotate.py")
 
-    def run(args):
-        status = run_python(script_file, templates, options, args)
-        if status != 0:
-            return "An error has occurred Please check the output."
-        return "Finished successfully."
+    run = initialize_runner(script_file, templates, options)
 
     with gr.Column():
         status = gr.Textbox("", show_label=False, interactive=False)
@@ -30,6 +25,6 @@ def create_ui():
         with gr.Box():
             ui.title("Options")
             with gr.Column():
-                options_to_gradio(TEMPLATES, options)
+                options_to_gradio(templates, options)
         start.click(run, set(options.values()), status)
     init()

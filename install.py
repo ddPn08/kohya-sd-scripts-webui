@@ -32,7 +32,11 @@ def xformers_version():
 def prepare_environment():
     torch_command = os.environ.get(
         "TORCH_COMMAND",
-        "pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117",
+        "pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113",
+    )
+    xformers_windows_package = os.environ.get(
+        "XFORMERS_WINDOWS_PACKAGE",
+        "https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/f/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl",
     )
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
@@ -48,14 +52,14 @@ def prepare_environment():
     )
     sys.argv, reinstall_xformers = launch.extract_arg(sys.argv, "--reinstall-xformers")
     sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
-    xformers = '--xformers' in sys.argv
-    ngrok = '--ngrok' in sys.argv
+    xformers = "--xformers" in sys.argv
+    ngrok = "--ngrok" in sys.argv
 
     if (
         reinstall_torch
         or not launch.is_installed("torch")
         or not launch.is_installed("torchvision")
-    ):
+    ) and not disable_strict_version:
         launch.run(
             f'"{launch.python}" -m {torch_command}',
             "Installing torch and torchvision",
@@ -68,7 +72,19 @@ def prepare_environment():
         )
 
     if (not launch.is_installed("xformers") or reinstall_xformers) and xformers:
-        launch.run_pip("install xformers==0.0.16rc425", "xformers")
+        if platform.system() == "Windows":
+            if platform.python_version().startswith("3.10"):
+                launch.run_pip(
+                    f"install -U -I --no-deps {xformers_windows_package}", "xformers"
+                )
+            else:
+                print(
+                    "Installation of xformers is not supported in this version of Python."
+                )
+                if not launch.is_installed("xformers"):
+                    exit(0)
+        else:
+            launch.run_pip("install xformers==0.0.16rc425", "xformers")
 
     if os.path.exists(repo_dir):
         launch.run(f"cd {repo_dir} && {launch.git} fetch --prune")

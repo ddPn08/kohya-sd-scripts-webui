@@ -120,7 +120,7 @@ def check_key(d, k):
     return k in d and d[k] is not None
 
 
-def arg_type(d):
+def get_arg_type(d):
     if check_key(d, "choices"):
         return list
     if check_key(d, "type"):
@@ -145,7 +145,7 @@ def options_to_gradio(options, out, overrides={}):
 
         help = item["help"] if "help" in item else ""
         id = f"kohya_sd_webui__{shared.current_tab.replace('.', '_')}_{key}"
-        type = override["type"] if "type" in override else arg_type(item)
+        type = override["type"] if "type" in override else get_arg_type(item)
         if type == list:
             choices = [
                 c if c is not None else "None"
@@ -203,31 +203,34 @@ def gradio_to_args(arguments, options, args, strarg=False):
                 return k, arg
         return None, None
 
-    def format(k):
-        item = args[options[k]]
-        key, arg = find_arg(k)
-        atype = arg_type(arg)
+    def get_value(key):
+        item = args[options[key]]
+        raw_key, arg = find_arg(key)
+        arg_type = get_arg_type(arg)
         multiple = "nargs" in arg and arg["nargs"] == "*"
 
-        def typer(x):
-            if atype is None or x is None or x == "None":
+        def set_type(x):
+            if x is None or x == "None":
+                return None
+            elif arg_type is None:
                 return x
-            elif atype == list:
+            elif arg_type == list:
                 return x
-            else:
-                return atype(x)
+            return arg_type(x)
 
         if multiple and item is None or item == "":
-            return key, None
+            return raw_key, None
 
-        return key, ([typer(x) for x in item.split(",")] if multiple else typer(item))
+        return raw_key, (
+            [set_type(x) for x in item.split(",")] if multiple else set_type(item)
+        )
 
     if strarg:
         main = []
         optional = {}
 
         for k in options:
-            key, v = format(k)
+            key, v = get_value(k)
             if key.startswith("--"):
                 key = k.replace("--", "")
                 optional[key] = v
@@ -240,9 +243,7 @@ def gradio_to_args(arguments, options, args, strarg=False):
     else:
         result = {}
         for k in options:
-            _, v = format(k)
-            if type(v) != str and hasattr(v, "__len__"):
-                v = ",".join(v)
+            _, v = get_value(k)
             result[k] = v
         return result
 

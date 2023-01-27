@@ -4,10 +4,8 @@ import gradio as gr
 
 from kohya_ss.library import train_util
 from scripts import presets, ui
-from scripts.utils import (args_to_gradio, load_args_template,
-                           options_to_gradio, run_python)
-
-TEMPLATES, script_file = load_args_template("train_db.py")
+from scripts.runner import initialize_runner
+from scripts.utils import args_to_gradio, load_args_template, options_to_gradio
 
 
 def title():
@@ -29,7 +27,9 @@ def create_ui():
     sd_saving_options = {}
     dreambooth_options = {}
 
-    options = lambda: {
+    templates, script_file = load_args_template("train_db.py")
+
+    get_options = lambda: {
         **sd_models_options,
         **dataset_options,
         **training_options,
@@ -37,31 +37,27 @@ def create_ui():
         **dreambooth_options,
     }
 
-    templates = lambda: {
+    get_templates = lambda: {
         **sd_models_arguments.__dict__["_option_string_actions"],
         **dataset_arguments.__dict__["_option_string_actions"],
         **training_arguments.__dict__["_option_string_actions"],
         **sd_saving_arguments.__dict__["_option_string_actions"],
-        **TEMPLATES,
+        **templates,
     }
 
-    def run(args):
-        status = run_python(script_file, templates(), options(), args)
-        if status != 0:
-            return "An error has occurred Please check the output."
-        return "Finished successfully."
+    run = initialize_runner(script_file, get_templates, get_options)
 
     with gr.Column():
         status = gr.Textbox("", show_label=False, interactive=False)
         train_button = gr.Button("Run", variant="primary")
         with gr.Box():
             with gr.Row():
-                init = presets.create_ui("train_db", templates, options)
+                init = presets.create_ui("train_db", get_templates, get_options)
         with gr.Row():
             with gr.Group():
                 with gr.Box():
                     ui.title("Dreambooth options")
-                    options_to_gradio(TEMPLATES, dreambooth_options)
+                    options_to_gradio(templates, dreambooth_options)
                 with gr.Box():
                     ui.title("Model options")
                     args_to_gradio(sd_models_arguments, sd_models_options)
@@ -74,5 +70,5 @@ def create_ui():
             with gr.Box():
                 ui.title("Trianing options")
                 args_to_gradio(training_arguments, training_options)
-        train_button.click(run, set(options().values()), status)
+        train_button.click(run, set(get_options().values()), status)
     init()

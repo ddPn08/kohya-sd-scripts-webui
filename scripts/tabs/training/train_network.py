@@ -4,10 +4,8 @@ import gradio as gr
 
 from kohya_ss.library import train_util
 from scripts import presets, ui
-from scripts.utils import (args_to_gradio, load_args_template,
-                           options_to_gradio, run_python)
-
-TEMPLATES, script_file = load_args_template("train_network.py")
+from scripts.runner import initialize_runner
+from scripts.utils import args_to_gradio, load_args_template, options_to_gradio
 
 
 def title():
@@ -26,38 +24,36 @@ def create_ui():
     training_options = {}
     network_options = {}
 
-    options = lambda: {
+    templates, script_file = load_args_template("train_network.py")
+
+    get_options = lambda: {
         **sd_models_options,
         **dataset_options,
         **training_options,
         **network_options,
     }
 
-    templates = lambda: {
+    get_templates = lambda: {
         **sd_models_arguments.__dict__["_option_string_actions"],
         **dataset_arguments.__dict__["_option_string_actions"],
         **training_arguments.__dict__["_option_string_actions"],
-        **TEMPLATES,
+        **templates,
     }
 
-    def run(args):
-        status = run_python(script_file, templates(), options(), args)
-        if status != 0:
-            return "An error has occurred Please check the output."
-        return "Finished successfully."
+    run = initialize_runner(script_file, get_templates, get_options)
 
     with gr.Column():
         status = gr.Textbox("", show_label=False, interactive=False)
         train_button = gr.Button("Run", variant="primary")
         with gr.Box():
             with gr.Row():
-                init = presets.create_ui("train_network", templates, options)
+                init = presets.create_ui("train_network", get_templates, get_options)
         with gr.Row():
             with gr.Group():
                 with gr.Box():
                     ui.title("Network options")
                     options_to_gradio(
-                        TEMPLATES,
+                        templates,
                         network_options,
                         {
                             "network_module": {
@@ -75,5 +71,5 @@ def create_ui():
             with gr.Box():
                 ui.title("Trianing options")
                 args_to_gradio(training_arguments, training_options)
-        train_button.click(run, set(options().values()), status)
+        train_button.click(run, set(get_options().values()), status)
     init()
