@@ -57,7 +57,7 @@
             "unet_lr": null,
             "text_encoder_lr": null,
             "network_weights": null,
-            "network_module": "kohya_ss.networks.lora",
+            "network_module": "networks.lora",
             "network_dim": 16,
             "network_alpha": 1.0,
             "network_args": null,
