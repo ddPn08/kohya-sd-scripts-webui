@@ -16,11 +16,9 @@ def load_presets():
     if not os.path.exists(DEFAULT_PRESET_PATH):
         save_presets({}, DEFAULT_PRESET_PATH)
     with open(DEFAULT_PRESET_PATH, mode="r") as f:
-        txt = f.read()
-        obj = json.loads(txt)
+        obj = json.loads(f.read())
     with open(PRESET_PATH, mode="r") as f:
-        txt = f.read()
-        obj = {**obj, **json.loads(txt)}
+        obj = {**obj, **json.loads(f.read())}
 
     return obj
 

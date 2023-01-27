@@ -1,4 +1,4 @@
-import argparse
+import sys
 import launch
 import platform
 import os
@@ -29,9 +29,60 @@ def xformers_version():
         return None
 
 
-def install_requirements(disable_strict_version):
+def prepare_environment():
+    torch_command = os.environ.get(
+        "TORCH_COMMAND",
+        "pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117",
+    )
+    requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
+
+    sys.argv, skip_install = launch.extract_arg(sys.argv, "--skip-install")
+    if skip_install:
+        return
+
+    sys.argv, disable_strict_version = launch.extract_arg(
+        sys.argv, "--disable-strict-version"
+    )
+    sys.argv, skip_torch_cuda_test = launch.extract_arg(
+        sys.argv, "--skip-torch-cuda-test"
+    )
+    sys.argv, reinstall_xformers = launch.extract_arg(sys.argv, "--reinstall-xformers")
+    sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
+    sys.argv, xformers = launch.extract_arg(sys.argv, "--xformers")
+
+    if (
+        reinstall_torch
+        or not launch.is_installed("torch")
+        or not launch.is_installed("torchvision")
+    ):
+        launch.run(
+            f'"{launch.python}" -m {torch_command}',
+            "Installing torch and torchvision",
+            "Couldn't install torch",
+            live=True,
+        )
+
+    if not skip_torch_cuda_test:
+        launch.run_python(
+            "import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'"
+        )
+
+    if (not launch.is_installed("xformers") or reinstall_xformers) and xformers:
+        launch.run_pip("install xformers==0.0.16rc425", "xformers")
+
+    if os.path.exists(repo_dir):
+        launch.run(f"cd {repo_dir} && {launch.git} fetch --prune")
+        launch.run(f"cd {repo_dir} && {launch.git} reset --hard origin/main")
+    else:
+        launch.run(
+            f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git {repo_dir}"
+        )
+
+    if not launch.is_installed("gradio"):
+        launch.run_pip("install gradio==3.16.2", "gradio")
+
     if disable_strict_version:
-        with open(os.path.join(repo_dir, "requirements.txt"), "r") as f:
+        with open(os.path.join(repo_dir, requirements_file), "r") as f:
             txt = f.read()
             requirements = [
                 re.split("==|<|>", a)[0]
@@ -50,22 +101,6 @@ def install_requirements(disable_strict_version):
             errdesc=f"Couldn't install requirements for kohya sd-scripts",
         )
 
-
-def prepare_environment(args):
-    launch.run(f"{launch.python} -m pip --version")
-    if os.path.exists(repo_dir):
-        launch.run(f"cd {repo_dir} && {launch.git} fetch --prune")
-        launch.run(f"cd {repo_dir} && {launch.git} reset --hard origin/main")
-    else:
-        launch.run(
-            f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git {repo_dir}"
-        )
-
-    if not launch.is_installed("gradio"):
-        launch.run_pip("install gradio==3.16.2", "gradio")
-
-    install_requirements(args.disable_strict_version)
-
     if platform.system() == "Windows":
         for file in glob.glob(os.path.join(repo_dir, "bitsandbytes_windows", "*")):
             filename = os.path.basename(file)
@@ -81,4 +116,4 @@ def prepare_environment(args):
 
 
 if __name__ == "__main__":
-    prepare_environment(argparse.Namespace(**{"disable_strict_version": False}))
+    prepare_environment()

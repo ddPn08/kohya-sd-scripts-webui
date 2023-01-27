@@ -64,16 +64,16 @@ def run_pip(args, desc=None):
     )
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--disable-strict-version",
-        action="store_true",
-    )
-    args, _ = parser.parse_known_args(sys.argv)
-    sys.argv.remove("--disable-strict-version")
+def run_python(code, desc=None, errdesc=None):
+    return run(f'"{python}" -c "{code}"', desc, errdesc)
 
-    install.prepare_environment(args)
+
+def extract_arg(args, name):
+    return [x for x in args if x != name], name in args
+
+
+if __name__ == "__main__":
+    install.prepare_environment()
 
     from scripts import main
 
