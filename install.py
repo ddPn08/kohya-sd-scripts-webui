@@ -48,8 +48,8 @@ def prepare_environment():
     )
     sys.argv, reinstall_xformers = launch.extract_arg(sys.argv, "--reinstall-xformers")
     sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
-    sys.argv, ngrok = launch.extract_arg(sys.argv, "--ngrok")
-    sys.argv, xformers = launch.extract_arg(sys.argv, "--xformers")
+    xformers = '--xformers' in sys.argv
+    ngrok = '--ngrok' in sys.argv
 
     if (
         reinstall_torch
