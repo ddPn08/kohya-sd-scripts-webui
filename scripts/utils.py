@@ -206,19 +206,16 @@ def gradio_to_args(arguments, options, args, strarg=False):
     def format(k):
         item = args[options[k]]
         key, arg = find_arg(k)
-        t = arg_type(arg)
+        atype = arg_type(arg)
         multiple = "nargs" in arg and arg["nargs"] == "*"
 
-        def typer(v):
-            if v == "None":
-                return None
-            if v:
-                if t == int:
-                    return int(v)
-                if t == float:
-                    return float(v)
-                return v
-            return None
+        def typer(x):
+            if atype is None or x is None or x == "None":
+                return x
+            elif atype == list:
+                return x
+            else:
+                return atype(x)
 
         if multiple and item is None or item == "":
             return key, None
@@ -229,10 +226,11 @@ def gradio_to_args(arguments, options, args, strarg=False):
         main = []
         optional = {}
 
-        for k in options.keys():
+        for k in options:
             key, v = format(k)
             if key.startswith("--"):
-                optional[key.replace("--", "")] = v
+                key = k.replace("--", "")
+                optional[key] = v
             else:
                 main.append(v)
 
@@ -240,8 +238,13 @@ def gradio_to_args(arguments, options, args, strarg=False):
 
         return f"{' '.join(main)} {make_args(optional)}"
     else:
-        args = [(k, format(k)) for k in options.keys()]
-        return dict(args)
+        result = {}
+        for k in options:
+            _, v = format(k)
+            if type(v) != str and hasattr(v, "__len__"):
+                v = ",".join(v)
+            result[k] = v
+        return result
 
 
 def run_python(script, templates, options, args):

@@ -113,7 +113,7 @@ def create_ui(key, tmpls, opts):
                 result.append(None)
                 continue
             result.append(preset[k])
-        return result
+        return result[0] if len(result) == 1 else result
 
     def _delete_preset(name):
         if not name:
