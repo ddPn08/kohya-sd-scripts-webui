@@ -108,7 +108,17 @@ def on_ui_tabs():
 
 def launch():
     [demo] = on_ui_tabs()
-    demo[0].launch(share=shared.cmd_opts.share)
+    if shared.cmd_opts.ngrok is not None:
+        import scripts.ngrok as ngrok
+
+        address = ngrok.connect(
+            shared.cmd_opts.ngrok,
+            shared.cmd_opts.port if shared.cmd_opts.port is not None else 7860,
+            shared.cmd_opts.ngrok_region,
+        )
+        print('Running on ngrok URL: ' + address)
+
+    demo[0].launch(share=shared.cmd_opts.share, server_port=shared.cmd_opts.port)
 
 
 if not hasattr(shared, "gradio_template_response_original"):

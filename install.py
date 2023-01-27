@@ -48,6 +48,7 @@ def prepare_environment():
     )
     sys.argv, reinstall_xformers = launch.extract_arg(sys.argv, "--reinstall-xformers")
     sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
+    sys.argv, ngrok = launch.extract_arg(sys.argv, "--ngrok")
     sys.argv, xformers = launch.extract_arg(sys.argv, "--xformers")
 
     if (
@@ -79,6 +80,9 @@ def prepare_environment():
 
     if not launch.is_installed("gradio"):
         launch.run_pip("install gradio==3.16.2", "gradio")
+
+    if not launch.is_installed("pyngrok") and ngrok:
+        launch.run_pip("install pyngrok", "ngrok")
 
     if disable_strict_version:
         with open(os.path.join(repo_dir, requirements_file), "r") as f:
