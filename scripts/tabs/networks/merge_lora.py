@@ -6,7 +6,7 @@ from kohya_ss.networks import merge_lora
 from scripts import presets, ui
 from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
 
-TEMPLATES = load_args_template("networks", "merge_lora.py")
+TEMPLATES, _ = load_args_template("networks", "merge_lora.py")
 
 
 def title():

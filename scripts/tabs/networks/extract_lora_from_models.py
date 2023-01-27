@@ -6,7 +6,7 @@ from kohya_ss.networks import extract_lora_from_models
 from scripts import presets, ui
 from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
 
-TEMPLATES = load_args_template("networks", "extract_lora_from_models.py")
+TEMPLATES, _ = load_args_template("networks", "extract_lora_from_models.py")
 
 
 def title():

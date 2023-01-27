@@ -6,7 +6,7 @@ from kohya_ss.tools import convert_diffusers20_original_sd
 from scripts import presets, ui
 from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
 
-TEMPLATES = load_args_template("tools", "convert_diffusers20_original_sd.py")
+TEMPLATES, _ = load_args_template("tools", "convert_diffusers20_original_sd.py")
 
 
 def title():

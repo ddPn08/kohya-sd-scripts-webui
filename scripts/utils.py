@@ -1,12 +1,15 @@
 import ast
 import importlib
 import os
-from pathlib import Path
+import subprocess
+import sys
 
 import gradio as gr
 
 import scripts.shared as shared
 from scripts.shared import ROOT_DIR
+
+python = sys.executable
 
 
 def path_to_module(filepath):
@@ -110,7 +113,7 @@ def load_args_template(*filename):
             if "if __name__ == '__main__'" in line:
                 add = True
                 continue
-    return compile_arg_parser(txt, path_to_module(filepath))
+    return compile_arg_parser(txt, path_to_module(filepath)), filepath
 
 
 def check_key(d, k):
@@ -216,10 +219,21 @@ def gradio_to_args(arguments, options, args):
                 return v
             return None
 
-        if multiple and item == "":
+        if multiple and item is None or item == "":
             return None
 
         return [typer(x) for x in item.split(",")] if multiple else typer(item)
 
     args = [(k, format(k)) for k in options.keys()]
     return dict(args)
+
+
+def run_python(args, **kwargs):
+    print(f"Started Python: {args}")
+    ps = subprocess.run(
+        f"{python} {args}",
+        shell=True,
+        **kwargs,
+    )
+
+    return ps.returncode

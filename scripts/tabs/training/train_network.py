@@ -1,15 +1,13 @@
 import argparse
-import traceback
 
 import gradio as gr
 
-from kohya_ss import train_network
 from kohya_ss.library import train_util
 from scripts import presets, ui
 from scripts.utils import (args_to_gradio, gradio_to_args, load_args_template,
-                           options_to_gradio)
+                           make_args, options_to_gradio, run_python)
 
-TEMPLATES = load_args_template("train_network.py")
+TEMPLATES, script_file = load_args_template("train_network.py")
 
 
 def title():
@@ -44,12 +42,11 @@ def create_ui():
 
     def train(args):
         args = gradio_to_args(templates(), options(), args)
-        try:
-            train_network.train(argparse.Namespace(**args))
-        except Exception as e:
-            print(traceback.format_exc(limit=50))
-            return e.args
-        return "Finished."
+        args = make_args(args)
+        status = run_python(f"{script_file} {args}")
+        if status != 0:
+            return "An error has occurred Please check the output."
+        return "Finished successfully."
 
     with gr.Column():
         status = gr.Textbox("", show_label=False, interactive=False)
@@ -67,7 +64,7 @@ def create_ui():
                         {
                             "network_module": {
                                 "type": list,
-                                "choices": ["kohya_ss.networks.lora"],
+                                "choices": ["networks.lora"],
                             }
                         },
                     )

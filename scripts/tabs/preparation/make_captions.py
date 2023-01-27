@@ -6,7 +6,7 @@ from kohya_ss.finetune import make_captions
 from scripts import presets, ui
 from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
 
-TEMPLATES = load_args_template("finetune", "make_captions.py")
+TEMPLATES, _ = load_args_template("finetune", "make_captions.py")
 
 
 def title():

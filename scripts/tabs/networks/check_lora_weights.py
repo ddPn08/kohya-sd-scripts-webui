@@ -1,5 +1,4 @@
 import argparse
-import logging
 
 import gradio as gr
 
@@ -7,7 +6,7 @@ from kohya_ss.networks import check_lora_weights
 from scripts import presets, ui
 from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
 
-TEMPLATES = load_args_template("networks", "check_lora_weights.py")
+TEMPLATES, _ = load_args_template("networks", "check_lora_weights.py")
 
 
 def title():

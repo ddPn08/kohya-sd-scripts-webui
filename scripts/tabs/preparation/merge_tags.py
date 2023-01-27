@@ -6,7 +6,7 @@ from kohya_ss.finetune import merge_dd_tags_to_metadata
 from scripts import presets, ui
 from scripts.utils import gradio_to_args, load_args_template, options_to_gradio
 
-TEMPLATES = load_args_template("finetune", "merge_dd_tags_to_metadata.py")
+TEMPLATES, _ = load_args_template("finetune", "merge_dd_tags_to_metadata.py")
 
 
 def title():
