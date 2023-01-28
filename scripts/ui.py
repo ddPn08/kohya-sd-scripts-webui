@@ -35,13 +35,20 @@ def create_ui(css):
                     for lib in tabs:
                         try:
                             module_path = path_to_module(lib)
-                            shared.current_tab = module_path
+                            module_name = module_path.replace(".", "_")
+
                             module = importlib.import_module(module_path)
+                            shared.current_tab = module_name
+                            print("loading tab: " + module_name)
+                            shared.loaded_tabs.append(module_name)
+
                             with gr.TabItem(module.title()):
                                 module.create_ui()
                         except Exception as e:
                             print(f"Failed to load {module_path}")
                             print(e)
                 sys.path.remove(dir)
+            with gr.TabItem("terminal"):
+                gr.HTML('<div id="kohya_sd_webui__terminal_outputs"></div>')
     sys.path = [x for x in sys.path if x not in PATHS]
     return ui

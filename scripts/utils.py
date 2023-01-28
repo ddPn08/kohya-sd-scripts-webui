@@ -183,18 +183,6 @@ def args_to_gradio(args, out):
     options_to_gradio(args.__dict__["_option_string_actions"], out)
 
 
-def make_args(d):
-    arguments = ""
-    for k, v in d.items():
-        if type(v) == bool:
-            arguments += f"--{k} " if v else ""
-        elif type(v) == str and v:
-            arguments += f'--{k}="{v}" '
-        elif v:
-            arguments += f"--{k}={v} "
-    return arguments
-
-
 def gradio_to_args(arguments, options, args, strarg=False):
     def find_arg(key):
         for k, arg in arguments.items():
@@ -239,7 +227,7 @@ def gradio_to_args(arguments, options, args, strarg=False):
 
         main = [x for x in main if x is not None]
 
-        return f"{' '.join(main)} {make_args(optional)}"
+        return main, optional
     else:
         result = {}
         for k in options:
@@ -248,13 +236,25 @@ def gradio_to_args(arguments, options, args, strarg=False):
         return result
 
 
+def make_args(d):
+    arguments = []
+    for k, v in d.items():
+        if type(v) == bool:
+            arguments.append(f"--{k}" if v else "")
+        elif type(v) == str and v:
+            arguments.extend([f"--{k}", f"{v}"])
+        elif v:
+            arguments.extend([f"--{k}", f"{v}"])
+    return arguments
+
+
 def run_python(script, templates, options, args):
-    args = gradio_to_args(templates, options, args, strarg=True)
-    cmd = f"{python} {script} {args}"
-    print(f"Started Python: {cmd}")
-    ps = subprocess.run(
-        cmd,
-        shell=True,
+    main, optional = gradio_to_args(templates, options, args, strarg=True)
+    args = [x for x in [*main, *make_args(optional)] if x]
+    print(f"Started Python: {script}")
+    print("Arguments: ", [*main, *args])
+    ps = subprocess.Popen(
+        [python, "-u", script, *args], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
 
-    return ps.returncode
+    return ps

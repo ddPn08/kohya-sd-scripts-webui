@@ -37,17 +37,14 @@ def create_ui():
         **sd_models_arguments.__dict__["_option_string_actions"],
         **dataset_arguments.__dict__["_option_string_actions"],
         **training_arguments.__dict__["_option_string_actions"],
-        **TEMPLATES,
+        **templates,
     }
 
-    run = initialize_runner(script_file, get_templates, get_options)
-
     with gr.Column():
-        status = gr.Textbox("", show_label=False, interactive=False)
-        train_button = gr.Button("Run", variant="primary")
+        init_runner = initialize_runner(script_file, get_templates, get_options)
         with gr.Box():
             with gr.Row():
-                init = presets.create_ui(
+                init_ui = presets.create_ui(
                     "train_textual_inversion", get_templates, get_options
                 )
         with gr.Row():
@@ -64,5 +61,6 @@ def create_ui():
             with gr.Box():
                 ui.title("Trianing options")
                 args_to_gradio(training_arguments, training_options)
-        train_button.click(run, set(get_options().values()), status)
-    init()
+
+    init_runner()
+    init_ui()

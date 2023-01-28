@@ -1,8 +1,10 @@
 import json
 import os
+import time
 
 import gradio.routes
 
+import scripts.runner as runner
 import scripts.shared as shared
 from scripts.shared import ROOT_DIR, is_webui_extension
 from scripts.ui import create_ui
@@ -14,21 +16,24 @@ def create_js():
         js = f.read()
 
     js = js.replace("kohya_sd_webui__help_map", json.dumps(shared.help_title_map))
+    js = js.replace(
+        "kohya_sd_webui__all_tabs",
+        json.dumps(shared.loaded_tabs),
+    )
     return js
 
 
 def create_head():
     head = f'<script type="text/javascript">{create_js()}</script>'
 
-    def template_response(*args, **kwargs):
-        res = shared.gradio_template_response_original(*args, **kwargs)
-        res.body = res.body.replace(b"</head>", f"{head}</head>".encode("utf8"))
-        res.init_headers()
-        return res
-
     def template_response_for_webui(*args, **kwargs):
         res = shared.gradio_template_response_original(*args, **kwargs)
         res.body = res.body.replace(b"</head>", f"{head}</head>".encode("utf8"))
+        return res
+
+    def template_response(*args, **kwargs):
+        res = template_response_for_webui(*args, **kwargs)
+        res.init_headers()
         return res
 
     if is_webui_extension():
@@ -39,7 +44,13 @@ def create_head():
         gradio.routes.templates.TemplateResponse = template_response
 
 
+def wait_on_server():
+    while 1:
+        time.sleep(0.5)
+
+
 def on_ui_tabs():
+    print("ok")
     cssfile = os.path.join(ROOT_DIR, "style.css")
     with open(cssfile, mode="r") as f:
         css = f.read()
@@ -49,7 +60,7 @@ def on_ui_tabs():
 
 
 def launch():
-    [demo] = on_ui_tabs()
+    block, _, _ = on_ui_tabs()[0]
     if shared.cmd_opts.ngrok is not None:
         import scripts.ngrok as ngrok
 
@@ -60,7 +71,15 @@ def launch():
         )
         print("Running on ngrok URL: " + address)
 
-    demo[0].launch(share=shared.cmd_opts.share, server_port=shared.cmd_opts.port)
+    app, local_url, share_url = block.launch(
+        share=shared.cmd_opts.share,
+        server_port=shared.cmd_opts.port,
+        prevent_thread_lock=True,
+    )
+
+    runner.initialize_api(app)
+
+    wait_on_server()
 
 
 if not hasattr(shared, "gradio_template_response_original"):

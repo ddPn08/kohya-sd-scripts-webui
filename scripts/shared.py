@@ -19,6 +19,7 @@ ROOT_DIR = (
 )
 
 current_tab = None
+loaded_tabs = []
 help_title_map = {}
 
 parser = argparse.ArgumentParser()
