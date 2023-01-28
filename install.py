@@ -30,9 +30,13 @@ def xformers_version():
 
 
 def prepare_environment():
+    torch_command_win = os.environ.get(
+        "TORCH_COMMAND_WIN",
+        "pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113",
+    )
     torch_command = os.environ.get(
         "TORCH_COMMAND",
-        "pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113",
+        "pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117",
     )
     xformers_windows_package = os.environ.get(
         "XFORMERS_WINDOWS_PACKAGE",
@@ -61,7 +65,7 @@ def prepare_environment():
         or not launch.is_installed("torchvision")
     ) and not disable_strict_version:
         launch.run(
-            f'"{launch.python}" -m {torch_command}',
+            f'"{launch.python}" -m {torch_command_win if platform.system() == "Windows" else torch_command}',
             "Installing torch and torchvision",
             "Couldn't install torch",
         )
