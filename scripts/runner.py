@@ -36,7 +36,7 @@ def initialize_runner(script_file, tmpls, opts):
         proc = run_python(script_file, get_templates(), get_options(), args)
         outputs.append("\n")
         for line in iter(proc.stdout.readline, b""):
-            sys.stdout.write(line)
+            sys.stdout.write(line.decode("utf-8"))
             outputs.append(line.decode("utf-8").replace("\n", ""))
         proc.kill()
         proc = None
