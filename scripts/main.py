@@ -50,7 +50,6 @@ def wait_on_server():
 
 
 def on_ui_tabs():
-    print("ok")
     cssfile = os.path.join(ROOT_DIR, "style.css")
     with open(cssfile, mode="r") as f:
         css = f.read()

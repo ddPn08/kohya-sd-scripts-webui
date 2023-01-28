@@ -39,7 +39,6 @@ def create_ui(css):
 
                             module = importlib.import_module(module_path)
                             shared.current_tab = module_name
-                            print("loading tab: " + module_name)
                             shared.loaded_tabs.append(module_name)
 
                             with gr.TabItem(module.title()):
