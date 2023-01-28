@@ -1,7 +1,6 @@
-from pyngrok import conf, exception, ngrok
-
-
 def connect(token, port, region):
+    from pyngrok import conf, exception, ngrok
+
     account = None
     if token is None:
         token = "None"
