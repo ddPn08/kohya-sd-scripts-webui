@@ -30,7 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const initializeTerminalObserver = () => {
                 const container = gradioApp().querySelector("#kohya_sd_webui__terminal_outputs")
                 setInterval(async () => {
-                    const res = await fetch('./internal/terminal/outputs', {
+                    const res = await fetch('./internal/extensions/kohya-sd-scripts-webui/terminal/outputs', {
                         method: "POST",
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -50,7 +50,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             const checkProcessIsAlive = () => {
                 setInterval(async () => {
-                    const res = await fetch('./internal/process/alive')
+                    const res = await fetch('./internal/extensions/kohya-sd-scripts-webui/process/alive')
                     const obj = await res.json()
                     for (const tab of all_tabs)
                         kohya_sd_webui__toggle_runner_button(tab, !obj.alive)
