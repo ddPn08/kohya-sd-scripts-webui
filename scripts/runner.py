@@ -1,3 +1,4 @@
+import io
 import sys
 
 import fastapi
@@ -31,13 +32,23 @@ def initialize_runner(script_file, tmpls, opts):
 
     def run(args):
         global proc
+        global outputs
         if alive():
             return
         proc = run_python(script_file, get_templates(), get_options(), args)
-        outputs.append("\n")
-        for line in iter(proc.stdout.readline, b""):
-            sys.stdout.write(line.decode("utf-8"))
-            outputs.append(line.decode("utf-8").replace("\n", ""))
+        reader = io.TextIOWrapper(proc.stdout, encoding="utf-8-sig")
+        line = ""
+        while proc.poll() is None:
+            try:
+                char = reader.read(1)
+                sys.stdout.write(char)
+                if char == "\n":
+                    outputs.append(line)
+                    line = ""
+                    continue
+                line += char
+            except:
+                ()
         proc.kill()
         proc = None
 
@@ -83,13 +94,13 @@ def api_get_isalive(req: fastapi.Request):
 
 def initialize_api(app: fastapi.FastAPI):
     app.add_api_route(
-        "/internal/terminal/outputs",
+        "/internal/extensions/kohya-sd-scripts-webui/terminal/outputs",
         api_get_outputs,
         methods=["POST"],
         response_model=GetOutputResponse,
     )
     app.add_api_route(
-        "/internal/process/alive",
+        "/internal/extensions/kohya-sd-scripts-webui/process/alive",
         api_get_isalive,
         methods=["GET"],
         response_model=ProcessAliveResponse,

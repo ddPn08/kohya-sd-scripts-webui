@@ -87,7 +87,11 @@ if not hasattr(shared, "gradio_template_response_original"):
 if is_webui_extension():
     from modules import script_callbacks
 
+    def initialize_api(_, app):
+        runner.initialize_api(app)
+
     script_callbacks.on_ui_tabs(on_ui_tabs)
+    script_callbacks.on_app_started(initialize_api)
 
 if __name__ == "__main__":
     launch()
