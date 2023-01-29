@@ -38,7 +38,7 @@ def initialize_runner(script_file, tmpls, opts):
         proc = run_python(script_file, get_templates(), get_options(), args)
         reader = io.TextIOWrapper(proc.stdout, encoding="utf-8-sig")
         line = ""
-        while proc.poll() is None:
+        while proc is not None and proc.poll() is None:
             try:
                 char = reader.read(1)
                 sys.stdout.write(char)
@@ -49,7 +49,6 @@ def initialize_runner(script_file, tmpls, opts):
                 line += char
             except:
                 ()
-        proc.kill()
         proc = None
 
     def stop():
