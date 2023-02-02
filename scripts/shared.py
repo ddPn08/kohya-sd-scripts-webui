@@ -51,4 +51,9 @@ parser.add_argument(
     action="store_true",
     help="Hide built-in presets",
 )
+parser.add_argument(
+    "--enable-console-log",
+    action="store_true",
+    help="Print script output to console",
+)
 cmd_opts, _ = parser.parse_known_args(sys.argv)

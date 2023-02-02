@@ -254,7 +254,10 @@ def run_python(script, templates, options, args):
     print(f"Started Python: {script}")
     print("Arguments: ", [*main, *args])
     ps = subprocess.Popen(
-        [python, "-u", script, *args], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        [python, "-u", script, *args],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=os.path.join(ROOT_DIR, "kohya_ss"),
     )
 
     return ps
