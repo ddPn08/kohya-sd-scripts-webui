@@ -30,17 +30,9 @@ def xformers_version():
 
 
 def prepare_environment():
-    torch_command_win = os.environ.get(
-        "TORCH_COMMAND_WIN",
-        "pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113",
-    )
     torch_command = os.environ.get(
         "TORCH_COMMAND",
         "pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117",
-    )
-    xformers_windows_package = os.environ.get(
-        "XFORMERS_WINDOWS_PACKAGE",
-        "https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/f/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl",
     )
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
@@ -65,7 +57,7 @@ def prepare_environment():
         or not launch.is_installed("torchvision")
     ) and not disable_strict_version:
         launch.run(
-            f'"{launch.python}" -m {torch_command_win if platform.system() == "Windows" else torch_command}',
+            f'"{launch.python}" -m {torch_command}',
             "Installing torch and torchvision",
             "Couldn't install torch",
         )
@@ -76,19 +68,7 @@ def prepare_environment():
         )
 
     if (not launch.is_installed("xformers") or reinstall_xformers) and xformers:
-        if platform.system() == "Windows":
-            if platform.python_version().startswith("3.10"):
-                launch.run_pip(
-                    f"install -U -I --no-deps {xformers_windows_package}", "xformers"
-                )
-            else:
-                print(
-                    "Installation of xformers is not supported in this version of Python."
-                )
-                if not launch.is_installed("xformers"):
-                    exit(0)
-        else:
-            launch.run_pip("install xformers==0.0.16rc425", "xformers")
+        launch.run_pip("install xformers==0.0.17.dev443", "xformers")
 
     if os.path.exists(repo_dir):
         launch.run(f"cd {repo_dir} && {launch.git} fetch --prune")
