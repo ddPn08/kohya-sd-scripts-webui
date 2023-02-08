@@ -73,6 +73,7 @@ def launch():
     app, local_url, share_url = block.launch(
         share=shared.cmd_opts.share,
         server_port=shared.cmd_opts.port,
+        server_name=shared.cmd_opts.host,
         prevent_thread_lock=True,
     )
 
