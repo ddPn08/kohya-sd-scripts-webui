@@ -59,6 +59,8 @@ def compile_arg_parser(txt, module_path=None):
             return literal_eval(arg, module_path)
 
     for line in txt.split("\n"):
+        line = line.split("#")[0]
+
         if "parser.add_argument(" in line:
             in_parser = True
             line = line.replace("parser.add_argument(", "")
