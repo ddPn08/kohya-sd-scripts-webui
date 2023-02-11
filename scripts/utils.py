@@ -59,6 +59,8 @@ def compile_arg_parser(txt, module_path=None):
             return literal_eval(arg, module_path)
 
     for line in txt.split("\n"):
+        line = line.split("#")[0]
+
         if "parser.add_argument(" in line:
             in_parser = True
             line = line.replace("parser.add_argument(", "")
@@ -110,7 +112,7 @@ def load_args_template(*filename):
         for line in lines:
             if add == True:
                 txt += line
-            if "if __name__ == '__main__'" in line:
+            if "if __name__ == '__main__'" in line or "def main()" in line:
                 add = True
                 continue
     return compile_arg_parser(txt, path_to_module(filepath)), filepath
