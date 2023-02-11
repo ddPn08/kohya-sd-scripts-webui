@@ -17,7 +17,7 @@ def create_ui():
     dataset_arguments = argparse.ArgumentParser()
     training_arguments = argparse.ArgumentParser()
     train_util.add_sd_models_arguments(sd_models_arguments)
-    train_util.add_dataset_arguments(dataset_arguments, True, True)
+    train_util.add_dataset_arguments(dataset_arguments, True, True, True)
     train_util.add_training_arguments(training_arguments, True)
     sd_models_options = {}
     dataset_options = {}
