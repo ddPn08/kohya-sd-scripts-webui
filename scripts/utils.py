@@ -223,6 +223,8 @@ def gradio_to_args(arguments, options, args, strarg=False):
             key, v = get_value(k)
             if key.startswith("--"):
                 key = k.replace("--", "")
+                if type(v) == list:
+                    v = ",".join([f"{x}" for x in v])
                 optional[key] = v
             else:
                 main.append(v)
