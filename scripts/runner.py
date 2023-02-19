@@ -6,7 +6,7 @@ import gradio as gr
 from pydantic import BaseModel, Field
 
 import scripts.shared as shared
-from scripts.utils import run_python
+from scripts.utilities import run_python
 
 proc = None
 outputs = []

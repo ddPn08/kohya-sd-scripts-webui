@@ -5,7 +5,7 @@ import gradio as gr
 
 import scripts.shared as shared
 from scripts.shared import ROOT_DIR
-from scripts.utils import gradio_to_args
+from scripts.utilities import gradio_to_args
 
 DEFAULT_PRESET_PATH = os.path.join(ROOT_DIR, "built-in-presets.json")
 PRESET_PATH = os.path.join(ROOT_DIR, "presets.json")

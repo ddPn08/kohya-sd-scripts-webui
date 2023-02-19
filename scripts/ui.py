@@ -7,7 +7,7 @@ import gradio as gr
 
 import scripts.shared as shared
 from scripts.shared import ROOT_DIR
-from scripts.utils import path_to_module
+from scripts.utilities import path_to_module
 
 
 def title(txt):

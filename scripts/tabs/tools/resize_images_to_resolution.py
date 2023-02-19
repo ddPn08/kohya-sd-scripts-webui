@@ -2,7 +2,7 @@ import gradio as gr
 
 from scripts import presets, ui
 from scripts.runner import initialize_runner
-from scripts.utils import load_args_template, options_to_gradio
+from scripts.utilities import load_args_template, options_to_gradio
 
 
 def title():
@@ -12,7 +12,9 @@ def title():
 def create_ui():
     options = {}
 
-    templates, script_file = load_args_template("tools", "resize_images_to_resolution.py")
+    templates, script_file = load_args_template(
+        "tools", "resize_images_to_resolution.py"
+    )
 
     with gr.Column():
         init_runner = initialize_runner(script_file, templates, options)

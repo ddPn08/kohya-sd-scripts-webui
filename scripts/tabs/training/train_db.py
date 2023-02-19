@@ -5,7 +5,7 @@ import gradio as gr
 from kohya_ss.library import train_util
 from scripts import presets, ui
 from scripts.runner import initialize_runner
-from scripts.utils import args_to_gradio, load_args_template, options_to_gradio
+from scripts.utilities import args_to_gradio, load_args_template, options_to_gradio
 
 
 def title():

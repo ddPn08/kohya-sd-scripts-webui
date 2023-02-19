@@ -18,6 +18,24 @@ def path_to_module(filepath):
     )
 
 
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, _ = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+
 def literal_eval(v, module=None):
     if v == "str":
         return str
@@ -257,8 +275,17 @@ def run_python(script, templates, options, args):
     args = [x for x in [*main, *make_args(optional)] if x]
     print(f"Started Python: {script}")
     print("Arguments: ", [*main, *args])
+
+    accelerate = which("accelerate")
+
+    executable = (
+        [python]
+        if accelerate is None
+        else [accelerate, "launch", "--num_cpu_threads_per_process", "1"]
+    )
+
     ps = subprocess.Popen(
-        [python, "-u", script, *args],
+        [*executable, "-u", script, *args],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=os.path.join(ROOT_DIR, "kohya_ss"),

@@ -2,7 +2,7 @@ import gradio as gr
 
 from scripts import ui
 from scripts.runner import initialize_runner
-from scripts.utils import load_args_template, options_to_gradio
+from scripts.utilities import load_args_template, options_to_gradio
 
 
 def title():
