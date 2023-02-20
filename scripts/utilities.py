@@ -276,16 +276,8 @@ def run_python(script, templates, options, args):
     print(f"Started Python: {script}")
     print("Arguments: ", [*main, *args])
 
-    accelerate = which("accelerate")
-
-    executable = (
-        [python]
-        if accelerate is None
-        else [accelerate, "launch", "--num_cpu_threads_per_process", "1"]
-    )
-
     ps = subprocess.Popen(
-        [*executable, "-u", script, *args],
+        [python, "-u", script, *args],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=os.path.join(ROOT_DIR, "kohya_ss"),
