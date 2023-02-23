@@ -199,8 +199,8 @@ def options_to_gradio(options, out, overrides={}):
         out[key] = component
 
 
-def args_to_gradio(args, out):
-    options_to_gradio(args.__dict__["_option_string_actions"], out)
+def args_to_gradio(args, out, overrides={}):
+    options_to_gradio(args.__dict__["_option_string_actions"], out, overrides)
 
 
 def gradio_to_args(arguments, options, args, strarg=False):
