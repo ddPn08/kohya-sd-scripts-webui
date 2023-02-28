@@ -230,7 +230,7 @@ def gradio_to_args(arguments, options, args, strarg=False):
             return raw_key, None
 
         return raw_key, (
-            [set_type(x) for x in item.split(",")] if multiple else set_type(item)
+            [set_type(x) for x in item.split(" ")] if multiple else set_type(item)
         )
 
     if strarg:
@@ -241,8 +241,6 @@ def gradio_to_args(arguments, options, args, strarg=False):
             key, v = get_value(k)
             if key.startswith("--"):
                 key = k.replace("--", "")
-                if type(v) == list:
-                    v = ",".join([f"{x}" for x in v])
                 optional[key] = v
             else:
                 main.append(v)
@@ -263,6 +261,8 @@ def make_args(d):
     for k, v in d.items():
         if type(v) == bool:
             arguments.append(f"--{k}" if v else "")
+        elif type(v) == list and len(v) > 0:
+            arguments.extend([f"--{k}", *v])
         elif type(v) == str and v:
             arguments.extend([f"--{k}", f"{v}"])
         elif v:
@@ -273,14 +273,13 @@ def make_args(d):
 def run_python(script, templates, options, args):
     main, optional = gradio_to_args(templates, options, args, strarg=True)
     args = [x for x in [*main, *make_args(optional)] if x]
-    print(f"Started Python: {script}")
-    print("Arguments: ", [*main, *args])
+    proc_args = [python, "-u", script, *args]
+    print("Start process: ", " ".join(proc_args))
 
     ps = subprocess.Popen(
-        [python, "-u", script, *args],
+        proc_args,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=os.path.join(ROOT_DIR, "kohya_ss"),
     )
-
     return ps
