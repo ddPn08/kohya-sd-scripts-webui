@@ -71,11 +71,11 @@ def prepare_environment():
         launch.run_pip("install xformers==0.0.17.dev451", "xformers")
 
     if os.path.exists(repo_dir):
-        launch.run(f"cd {repo_dir} && {launch.git} fetch --prune")
-        launch.run(f"cd {repo_dir} && {launch.git} reset --hard origin/main")
+        launch.run(f"cd \"{repo_dir}\" && {launch.git} fetch --prune")
+        launch.run(f"cd \"{repo_dir}\" && {launch.git} reset --hard origin/main")
     else:
         launch.run(
-            f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git {repo_dir}"
+            f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git \"{repo_dir}\""
         )
 
     if not launch.is_installed("gradio"):
@@ -94,12 +94,12 @@ def prepare_environment():
             ]
             requirements = " ".join(requirements)
             launch.run_pip(
-                f"install {requirements} {repo_dir}",
+                f"install \"{requirements}\" \"{repo_dir}\"",
                 "requirements for kohya sd-scripts",
             )
     else:
         launch.run(
-            f"cd {repo_dir} && {launch.python} -m pip install -r requirements.txt",
+            f"cd \"{repo_dir}\" && \"{launch.python}\" -m pip install -r requirements.txt",
             desc=f"Installing requirements for kohya sd-scripts",
             errdesc=f"Couldn't install requirements for kohya sd-scripts",
         )
