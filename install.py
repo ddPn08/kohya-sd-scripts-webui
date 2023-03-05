@@ -75,7 +75,7 @@ def prepare_environment():
         launch.run(f"cd \"{repo_dir}\" && {launch.git} reset --hard origin/main")
     else:
         launch.run(
-            f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git \"{repo_dir}\""
+            f"{launch.git} clone --depth 1 --branch v0.4.4 https://github.com/kohya-ss/sd-scripts.git \"{repo_dir}\""
         )
 
     if not launch.is_installed("gradio"):
