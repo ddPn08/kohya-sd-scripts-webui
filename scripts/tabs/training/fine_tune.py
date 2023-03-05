@@ -19,7 +19,7 @@ def create_ui():
     sd_saving_arguments = argparse.ArgumentParser()
     optimizer_arguments = argparse.ArgumentParser()
     train_util.add_sd_models_arguments(sd_models_arguments)
-    train_util.add_dataset_arguments(dataset_arguments, True, False, True)
+    train_util.add_dataset_arguments(dataset_arguments, False, True, True)
     train_util.add_training_arguments(training_arguments, True)
     train_util.add_sd_saving_arguments(sd_saving_arguments)
     train_util.add_optimizer_arguments(optimizer_arguments)
