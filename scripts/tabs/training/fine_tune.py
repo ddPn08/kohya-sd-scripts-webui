@@ -2,7 +2,7 @@ import argparse
 
 import gradio as gr
 
-from kohya_ss.library import train_util
+from kohya_ss.library import train_util, config_util
 from scripts import presets, ui, ui_overrides
 from scripts.runner import initialize_runner
 from scripts.utilities import args_to_gradio, load_args_template, options_to_gradio
@@ -18,16 +18,19 @@ def create_ui():
     training_arguments = argparse.ArgumentParser()
     sd_saving_arguments = argparse.ArgumentParser()
     optimizer_arguments = argparse.ArgumentParser()
+    config_arguments = argparse.ArgumentParser()
     train_util.add_sd_models_arguments(sd_models_arguments)
     train_util.add_dataset_arguments(dataset_arguments, False, True, True)
     train_util.add_training_arguments(training_arguments, False)
     train_util.add_sd_saving_arguments(sd_saving_arguments)
     train_util.add_optimizer_arguments(optimizer_arguments)
+    config_util.add_config_arguments(config_arguments)
     sd_models_options = {}
     dataset_options = {}
     training_options = {}
     sd_saving_options = {}
     optimizer_options = {}
+    config_options = {}
     finetune_options = {}
 
     templates, script_file = load_args_template("fine_tune.py")
@@ -39,6 +42,7 @@ def create_ui():
         **sd_saving_options,
         **optimizer_options,
         **finetune_options,
+        **config_options,
     }
 
     get_templates = lambda: {
@@ -47,6 +51,7 @@ def create_ui():
         **training_arguments.__dict__["_option_string_actions"],
         **sd_saving_arguments.__dict__["_option_string_actions"],
         **optimizer_arguments.__dict__["_option_string_actions"],
+        **config_arguments.__dict__["_option_string_actions"],
         **templates,
     }
 
@@ -66,6 +71,9 @@ def create_ui():
                 with gr.Box():
                     ui.title("Dataset options")
                     args_to_gradio(dataset_arguments, dataset_options)
+                with gr.Box():
+                    ui.title("Dataset Config options")
+                    args_to_gradio(config_arguments, config_options)
             with gr.Box():
                 ui.title("Training options")
                 args_to_gradio(training_arguments, training_options)

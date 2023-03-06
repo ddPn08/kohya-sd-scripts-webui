@@ -11,24 +11,6 @@ dirname = os.path.dirname(__file__)
 repo_dir = os.path.join(dirname, "kohya_ss")
 
 
-def torch_version():
-    try:
-        import torch
-
-        return torch.__version__
-    except Exception:
-        return None
-
-
-def xformers_version():
-    try:
-        import xformers
-
-        return xformers.__version__
-    except Exception:
-        return None
-
-
 def prepare_environment():
     torch_command = os.environ.get(
         "TORCH_COMMAND",
@@ -46,10 +28,12 @@ def prepare_environment():
     sys.argv, skip_torch_cuda_test = launch.extract_arg(
         sys.argv, "--skip-torch-cuda-test"
     )
+    sys.argv, update = launch.extract_arg(sys.argv, "--update")
     sys.argv, reinstall_xformers = launch.extract_arg(sys.argv, "--reinstall-xformers")
     sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
     xformers = "--xformers" in sys.argv
     ngrok = "--ngrok" in sys.argv
+    locon = "--locon" in sys.argv
 
     if (
         reinstall_torch
@@ -70,12 +54,12 @@ def prepare_environment():
     if (not launch.is_installed("xformers") or reinstall_xformers) and xformers:
         launch.run_pip("install xformers==0.0.17.dev451", "xformers")
 
-    if os.path.exists(repo_dir):
-        launch.run(f"cd \"{repo_dir}\" && {launch.git} fetch --prune")
-        launch.run(f"cd \"{repo_dir}\" && {launch.git} reset --hard origin/main")
-    else:
+    if update and os.path.exists(repo_dir):
+        launch.run(f'cd "{repo_dir}" && {launch.git} fetch --prune')
+        launch.run(f'cd "{repo_dir}" && {launch.git} reset --hard origin/main')
+    elif not os.path.exists(repo_dir):
         launch.run(
-            f"{launch.git} clone https://github.com/kohya-ss/sd-scripts.git \"{repo_dir}\""
+            f'{launch.git} clone https://github.com/kohya-ss/sd-scripts.git "{repo_dir}"'
         )
 
     if not launch.is_installed("gradio"):
@@ -83,6 +67,9 @@ def prepare_environment():
 
     if not launch.is_installed("pyngrok") and ngrok:
         launch.run_pip("install pyngrok", "ngrok")
+
+    if locon:
+        launch.run_pip("install locon", "locon")
 
     if disable_strict_version:
         with open(os.path.join(repo_dir, requirements_file), "r") as f:
@@ -94,12 +81,12 @@ def prepare_environment():
             ]
             requirements = " ".join(requirements)
             launch.run_pip(
-                f"install \"{requirements}\" \"{repo_dir}\"",
+                f'install "{requirements}" "{repo_dir}"',
                 "requirements for kohya sd-scripts",
             )
     else:
         launch.run(
-            f"cd \"{repo_dir}\" && \"{launch.python}\" -m pip install -r requirements.txt",
+            f'cd "{repo_dir}" && "{launch.python}" -m pip install -r requirements.txt',
             desc=f"Installing requirements for kohya sd-scripts",
             errdesc=f"Couldn't install requirements for kohya sd-scripts",
         )

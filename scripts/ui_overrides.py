@@ -1,7 +1,13 @@
+from . import shared
+
+def optional_network_modules():
+    if shared.cmd_opts.locon:
+        yield "locon.locon_kohya"
+
 NETWORK_OPTIONS = {
     "network_module": {
         "type": list,
-        "choices": ["networks.lora"],
+        "choices": ["networks.lora", *optional_network_modules()],
     }
 }
 
