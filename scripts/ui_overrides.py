@@ -1,4 +1,4 @@
-from . import shared
+from scripts import shared
 
 def optional_network_modules():
     if shared.cmd_opts.locon:
