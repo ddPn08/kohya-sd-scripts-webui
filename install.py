@@ -69,7 +69,12 @@ def prepare_environment():
         launch.run_pip("install pyngrok", "ngrok")
 
     if locon:
-        launch.run_pip("install locon", "locon")
+        if not launch.is_installed("locon"):
+            launch.run_pip("install locon", "locon")
+
+    if platform.system() == "Linux":
+        if not launch.is_installed("triton"):
+            launch.run_pip("install triton", "triton")
 
     if disable_strict_version:
         with open(os.path.join(repo_dir, requirements_file), "r") as f:
