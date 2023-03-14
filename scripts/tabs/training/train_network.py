@@ -59,11 +59,7 @@ def create_ui():
             with gr.Group():
                 with gr.Box():
                     ui.title("Network options")
-                    options_to_gradio(
-                        templates,
-                        network_options,
-                        ui_overrides.NETWORK_OPTIONS,
-                    )
+                    options_to_gradio(templates, network_options)
                 with gr.Box():
                     ui.title("Model options")
                     args_to_gradio(sd_models_arguments, sd_models_options)

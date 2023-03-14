@@ -33,7 +33,6 @@ def prepare_environment():
     sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
     xformers = "--xformers" in sys.argv
     ngrok = "--ngrok" in sys.argv
-    locon = "--locon" in sys.argv
 
     if (
         reinstall_torch
@@ -67,10 +66,6 @@ def prepare_environment():
 
     if not launch.is_installed("pyngrok") and ngrok:
         launch.run_pip("install pyngrok", "ngrok")
-
-    if locon:
-        if not launch.is_installed("locon"):
-            launch.run_pip("install locon", "locon")
 
     if platform.system() == "Linux":
         if not launch.is_installed("triton"):

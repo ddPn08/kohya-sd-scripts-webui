@@ -115,7 +115,7 @@ def create_ui(key, tmpls, opts):
             v = preset[k]
             if type(v) == list:
                 v = " ".join(v)
-            result.append(preset[k])
+            result.append(v)
         return result[0] if len(result) == 1 else result
 
     def _delete_preset(name):
