@@ -51,7 +51,7 @@ def prepare_environment():
         )
 
     if (not launch.is_installed("xformers") or reinstall_xformers) and xformers:
-        launch.run_pip("install xformers==0.0.17.dev473", "xformers")
+        launch.run_pip("install xformers --pre", "xformers")
 
     if update and os.path.exists(repo_dir):
         launch.run(f'cd "{repo_dir}" && {launch.git} fetch --prune')
