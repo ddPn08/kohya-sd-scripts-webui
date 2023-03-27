@@ -14,7 +14,7 @@ repo_dir = os.path.join(dirname, "kohya_ss")
 def prepare_environment():
     torch_command = os.environ.get(
         "TORCH_COMMAND",
-        "pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117",
+        "install torch==2.0.0+cu118 torchvision==0.15.1+cu118 --extra-index-url https://download.pytorch.org/whl/cu118",
     )
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
