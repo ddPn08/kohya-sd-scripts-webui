@@ -1,62 +1,97 @@
-import json
+import argparse
+import inspect
 import os
+from pathlib import Path
+import toml
+from kohya_ss.library import train_util, config_util
 
 import gradio as gr
 
-import scripts.shared as shared
 from scripts.shared import ROOT_DIR
 from scripts.utilities import gradio_to_args
 
-DEFAULT_PRESET_PATH = os.path.join(ROOT_DIR, "built-in-presets.json")
+PRESET_DIR = os.path.join(ROOT_DIR, "presets")
 PRESET_PATH = os.path.join(ROOT_DIR, "presets.json")
 
 
-def load_presets():
-    if not os.path.exists(PRESET_PATH):
-        save_presets({})
-    if not os.path.exists(DEFAULT_PRESET_PATH):
-        save_presets({}, DEFAULT_PRESET_PATH)
-    if shared.cmd_opts.hide_builtin_presets:
-        obj = {}
-    else:
-        with open(DEFAULT_PRESET_PATH, mode="r") as f:
-            obj = json.loads(f.read())
-    with open(PRESET_PATH, mode="r") as f:
-        obj = {**obj, **json.loads(f.read())}
+def get_arg_templates(fn):
+    parser = argparse.ArgumentParser()
+    args = [parser]
+    sig = inspect.signature(fn)
+    args.extend([True] * (len(sig.parameters) - 1))
+    fn(*args)
+    keys = [
+        x.replace("--", "") for x in parser.__dict__["_option_string_actions"].keys()
+    ]
+    keys = [x for x in keys if x not in ["help", "-h"]]
+    return keys, fn.__name__.replace("add_", "")
 
+
+arguments_functions = [
+    train_util.add_dataset_arguments,
+    train_util.add_optimizer_arguments,
+    train_util.add_sd_models_arguments,
+    train_util.add_sd_saving_arguments,
+    train_util.add_training_arguments,
+    config_util.add_config_arguments,
+]
+
+arg_templates = [get_arg_templates(x) for x in arguments_functions]
+
+
+def load_presets():
+    obj = {}
+    preset_names = os.listdir(PRESET_DIR)
+    for preset_name in preset_names:
+        preset_path = os.path.join(PRESET_DIR, preset_name)
+        obj[preset_name] = {}
+        for key in os.listdir(preset_path):
+            key = key.replace(".toml", "")
+            obj[preset_name][key] = load_preset(preset_name, key)
     return obj
 
 
-def save_presets(obj, path=PRESET_PATH):
-    with open(path, mode="w") as f:
-        f.write(json.dumps(obj))
-
-
 def load_preset(key, name):
-    obj = load_presets()
-    if key not in obj:
-        obj[key] = {}
-    if name not in obj[key]:
-        obj[key][name] = {}
+    filepath = os.path.join(PRESET_DIR, key, name + ".toml")
+    if not os.path.exists(filepath):
+        return {}
+    with open(filepath, mode="r") as f:
+        obj = toml.load(f)
 
-    return obj[key][name]
+    flatten = {}
+    for k, v in obj.items():
+        if not isinstance(v, dict):
+            flatten[k] = v
+        else:
+            for k2, v2 in v.items():
+                flatten[k2] = v2
+    return flatten
 
 
 def save_preset(key, name, value):
-    obj = load_presets()
-    if key not in obj:
-        obj[key] = {}
-    obj[key][name] = value
-    save_presets(obj)
+    obj = {}
+    for k, v in value.items():
+        if isinstance(v, Path):
+            v = str(v)
+        for (template, category) in arg_templates:
+            if k in template:
+                if category not in obj:
+                    obj[category] = {}
+                obj[category][k] = v
+                break
+        else:
+            obj[k] = v
+
+    filepath = os.path.join(PRESET_DIR, key, name + ".toml")
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, mode="w") as f:
+        toml.dump(obj, f)
 
 
 def delete_preset(key, name):
-    obj = load_presets()
-    if key not in obj:
-        obj[key] = {}
-
-    del obj[key][name]
-    save_presets(obj)
+    filepath = os.path.join(PRESET_DIR, key, name + ".toml")
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
 
 def create_ui(key, tmpls, opts):

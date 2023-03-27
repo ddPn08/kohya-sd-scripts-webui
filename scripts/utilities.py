@@ -130,7 +130,7 @@ def load_args_template(*filename):
         for line in lines:
             if add == True:
                 txt += line
-            if "if __name__ == '__main__'" in line or "def main()" in line:
+            if "def setup_parser()" in line:
                 add = True
                 continue
     return compile_arg_parser(txt, path_to_module(filepath)), filepath
