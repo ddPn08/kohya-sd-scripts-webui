@@ -14,7 +14,7 @@ repo_dir = os.path.join(dirname, "kohya_ss")
 def prepare_environment():
     torch_command = os.environ.get(
         "TORCH_COMMAND",
-        "install torch==2.0.0+cu118 torchvision==0.15.1+cu118 --extra-index-url https://download.pytorch.org/whl/cu118",
+        "pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 --extra-index-url https://download.pytorch.org/whl/cu118",
     )
     sd_scripts_repo = os.environ.get("SD_SCRIPTS_REPO", "https://github.com/kohya-ss/sd-scripts.git")
     sd_scripts_branch = os.environ.get("SD_SCRIPTS_BRANCH", "main")
