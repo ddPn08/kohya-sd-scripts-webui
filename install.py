@@ -17,23 +17,26 @@ def prepare_environment():
         "install torch==2.0.0+cu118 torchvision==0.15.1+cu118 --extra-index-url https://download.pytorch.org/whl/cu118",
     )
     sd_scripts_repo = os.environ.get("SD_SCRIPTS_REPO", "https://github.com/kohya-ss/sd-scripts.git")
+    sd_scripts_branch = os.environ.get("SD_SCRIPTS_BRANCH", "main")
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
     sys.argv, skip_install = launch.extract_arg(sys.argv, "--skip-install")
-    if skip_install:
-        return
-
     sys.argv, disable_strict_version = launch.extract_arg(
         sys.argv, "--disable-strict-version"
     )
     sys.argv, skip_torch_cuda_test = launch.extract_arg(
         sys.argv, "--skip-torch-cuda-test"
     )
+    sys.argv, skip_checkout_repo = launch.extract_arg(sys.argv, "--skip-checkout-repo")
     sys.argv, update = launch.extract_arg(sys.argv, "--update")
     sys.argv, reinstall_xformers = launch.extract_arg(sys.argv, "--reinstall-xformers")
     sys.argv, reinstall_torch = launch.extract_arg(sys.argv, "--reinstall-torch")
     xformers = "--xformers" in sys.argv
     ngrok = "--ngrok" in sys.argv
+
+    if skip_install:
+        return
+
 
     if (
         reinstall_torch
@@ -61,6 +64,9 @@ def prepare_environment():
         launch.run(
             f'{launch.git} clone {sd_scripts_repo} "{repo_dir}"'
         )
+
+    if not skip_checkout_repo:
+        launch.run(f'cd "{repo_dir}" && {launch.git} checkout {sd_scripts_branch}')
 
     if not launch.is_installed("gradio"):
         launch.run_pip("install gradio==3.16.2", "gradio")
