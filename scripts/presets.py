@@ -41,6 +41,7 @@ arg_templates = [get_arg_templates(x) for x in arguments_functions]
 
 def load_presets():
     obj = {}
+    os.makedirs(PRESET_DIR, exist_ok=True)
     preset_names = os.listdir(PRESET_DIR)
     for preset_name in preset_names:
         preset_path = os.path.join(PRESET_DIR, preset_name)
