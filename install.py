@@ -16,6 +16,7 @@ def prepare_environment():
         "TORCH_COMMAND",
         "install torch==2.0.0+cu118 torchvision==0.15.1+cu118 --extra-index-url https://download.pytorch.org/whl/cu118",
     )
+    sd_scripts_repo = os.environ.get("SD_SCRIPTS_REPO", "https://github.com/kohya-ss/sd-scripts.git")
     requirements_file = os.environ.get("REQS_FILE", "requirements.txt")
 
     sys.argv, skip_install = launch.extract_arg(sys.argv, "--skip-install")
@@ -58,7 +59,7 @@ def prepare_environment():
         launch.run(f'cd "{repo_dir}" && {launch.git} reset --hard origin/main')
     elif not os.path.exists(repo_dir):
         launch.run(
-            f'{launch.git} clone https://github.com/kohya-ss/sd-scripts.git "{repo_dir}"'
+            f'{launch.git} clone {sd_scripts_repo} "{repo_dir}"'
         )
 
     if not launch.is_installed("gradio"):
