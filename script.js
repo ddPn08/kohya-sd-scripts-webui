@@ -29,14 +29,26 @@ window.addEventListener('DOMContentLoaded', () => {
 
             const initializeTerminalObserver = () => {
                 const container = gradioApp().querySelector("#kohya_sd_webui__terminal_outputs")
+                const parentContainer = container.parentElement
+                const clearBtn = document.createElement('button')
+                clearBtn.innerText = 'Clear The Terminal'
+                clearBtn.style.color = 'yellow';
+                parentContainer.insertBefore(clearBtn, container)
+                let clearTerminal = false;
+                clearBtn.addEventListener('click', () => {
+                    container.innerHTML = ''
+                    clearTerminal = true
+                })
                 setInterval(async () => {
                     const res = await fetch('./internal/extensions/kohya-sd-scripts-webui/terminal/outputs', {
                         method: "POST",
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            output_index: container.children.length
+                            output_index: container.children.length,
+                            clear_terminal: clearTerminal,
                         }),
                     })
+                    clearTerminal = false
                     const obj = await res.json()
                     const isBottom = container.scrollHeight - container.scrollTop === container.clientHeight
                     for(const line of obj.outputs){
