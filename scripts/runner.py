@@ -72,6 +72,9 @@ class GetOutputRequest(BaseModel):
     output_index: int = Field(
         default=0, title="Index of the beginning of the log to retrieve"
     )
+    clear_terminal: bool = Field(
+        default=False, title="Whether to clear the terminal"
+    )
 
 
 class GetOutputResponse(BaseModel):
@@ -84,6 +87,9 @@ class ProcessAliveResponse(BaseModel):
 
 def api_get_outputs(req: GetOutputRequest):
     i = req.output_index
+    if req.clear_terminal:
+        global outputs
+        outputs = []
     out = outputs[i:] if len(outputs) > i else []
     return GetOutputResponse(outputs=out)
 
